@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.community.dao.DiscussPostMapper"> <!--写mapper的路径以对应-->
+
+    <sql id="selectFields">
+        id, user_id, title, content, type, status, create_time, comment_count, score
+    </sql>
+
+    <select id="selectDiscussPosts" resultType="DiscussPost"> <!--返回值只需要写DiscussPost类型就行，它会自己检测到List，因为List是java自带的-->
+        select <include refid="selectFields"></include> <!--引用了前面定义的参数，等价于 username, password, salt, email, type, status, activation_code, header_url, create_time-->
+        from discuss_post
+        where status != 2
+        <if test="userId!=0"> <!--为0时，返回所有帖子！-->
+            and user_id = #{userId}
+        </if>
+        order by type desc, create_time desc <!--现根据type降序，再根据创建时间降序-->
+        limit #{offset}, #{limit} <!--限制该页的起始行号和行数-->
+    </select>
+
+    <select id="selectDiscussPostRows" resultType="int"> <!--返回值只需要写DiscussPost类型就行，它会自己检测到List，因为List是java自带的-->
+        select count(id) <!--引用了前面定义的参数，等价于 username, password, salt, email, type, status, activation_code, header_url, create_time-->
+        from discuss_post
+        where status != 2
+        <if test="userId!=0"> <!--为0时，返回所有帖子！-->
+            and user_id = #{userId}
+        </if>
+    </select>
+
+</mapper>

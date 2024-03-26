@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"> <!--后面这段说明该html文件是一个模板，该模板来源于thymeleaf官网-->
+<head>
+    <meta charset="UTF-8">
+    <title>Teacher</title>
+</head>
+<body>
+    <p th:text="${name}"></p><!--th是thymeleaf缩写，这里是说明文本这一段的text来源于服务器接收的name-->
+    <p th:text="${age}"></p>
+</body>
+</html>

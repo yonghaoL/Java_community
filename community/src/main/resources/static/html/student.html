@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>学生测试</title>
+</head>
+<body>
+    <form method="post" action="/community/alpha/student"> <!--表示服务器请求方式是POST（而不是GET等其他的）,action是表示提交给服务器处理的路径-->
+        <p>
+            姓名：<input type="text" name="name"> <!--后面的name参数表示传给服务器的该数据的名字为nameOfText-->
+        </p>
+        <p>
+            年龄：<input type="text" name="age">
+        </p>
+        <p>
+            <input type="submit" value="提交">
+        </p>
+    </form>
+</body>
+</html>
