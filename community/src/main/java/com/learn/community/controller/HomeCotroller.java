@@ -29,7 +29,7 @@ public class HomeCotroller {
         // 方法调用前,SpringMVC会自动实例化Model和Page,并将Page注入Model.
         // 所以,在thymeleaf中可以直接访问Page对象中的数据. 且本方法返回model时不用将page add到 model中
         page.setRows(discussPostService.findDiscussPostRows(0));
-        page.setPath("/index");
+        page.setPath("/index");//该链接属性在index.html模板文件中用到，要复用该链接以生成点击下一页或者上一页的跳转链接
 
         List<DiscussPost> discussPostsNoUser = discussPostService.findDiscussPosts(0, page.getOffset(), page.getLimit());
 
