@@ -1,10 +1,14 @@
 package com.learn.community.controller;
 
+import com.learn.community.util.CommunityUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 @Controller
@@ -101,4 +105,46 @@ public class AlphaCotroller {
         return emps;
     }
     /************响应JSON数据（异步请求）***************/
+
+    // cookie示例
+
+    @RequestMapping(path = "/cookie/set", method = RequestMethod.GET)
+    @ResponseBody
+    public String setCookie(HttpServletResponse response) {//response是服务器返回给浏览器的内容
+        // 创建cookie
+        Cookie cookie = new Cookie("code", CommunityUtil.generateUUID());
+        // 设置cookie生效的范围,浏览器访问/community/alpha下的路径时才发送cookie给服务器
+        cookie.setPath("/community/alpha");
+        // 设置cookie的生存时间
+        cookie.setMaxAge(60 * 10);
+        // 发送cookie
+        response.addCookie(cookie);
+
+        return "set cookie";
+    }
+
+    @RequestMapping(path = "/cookie/get", method = RequestMethod.GET)
+    @ResponseBody
+    public String getCookie(@CookieValue("code") String code) { //该注解可以得到浏览器的request请求中key为“code”对应的cookie
+        System.out.println(code);
+        return "get cookie";
+    }
+
+    // session示例
+
+    @RequestMapping(path = "/session/set", method = RequestMethod.GET)
+    @ResponseBody
+    public String setSession(HttpSession session) { //session可以存很多数据（因为它不用来回传输，而是只存在服务器），而cookie只能存字符串，因为要传输
+        session.setAttribute("id", 1);
+        session.setAttribute("name", "Test");
+        return "set session";
+    }
+
+    @RequestMapping(path = "/session/get", method = RequestMethod.GET)
+    @ResponseBody
+    public String getSession(HttpSession session) {
+        System.out.println(session.getAttribute("id"));
+        System.out.println(session.getAttribute("name"));
+        return "get session";
+    }
 }

@@ -1,7 +1,10 @@
 package com.learn.community.service;
 
+import com.learn.community.dao.LoginTicketMapper;
 import com.learn.community.dao.UserMapper;
+import com.learn.community.entity.LoginTicket;
 import com.learn.community.entity.User;
+import com.learn.community.util.CommunityConstant;
 import com.learn.community.util.CommunityUtil;
 import com.learn.community.util.MailClient;
 import org.apache.commons.lang3.StringUtils;
@@ -17,15 +20,18 @@ import java.util.Map;
 import java.util.Random;
 
 @Service
-public class UserService {
+public class UserService implements CommunityConstant {
     @Autowired
-    private UserMapper userMapper;
+    private UserMapper userMapper; //注入mapper用于操作数据库
 
     @Autowired
     private MailClient mailClient;
 
     @Autowired
     private TemplateEngine templateEngine;
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
 
     @Value("${community.path.domain}") //@Value用于注入值(这里注入的是配置文件中的值)，@Autowired用于注入bean
     private String domain;
@@ -94,6 +100,81 @@ public class UserService {
         mailClient.sendMail(user.getEmail(), "激活账号", content);
 
         return map;
+    }
+
+    //激活码验证
+    public int activation(int userId, String code) {
+        User user = userMapper.selectById(userId);
+        if (user.getStatus() == 1) { //说明已经激活了
+            return ACTIVATION_REPEAT;
+        } else if (user.getActivationCode().equals(code)) { //激活成功
+            userMapper.updateStatus(userId, 1);
+            return ACTIVATION_SUCCESS;
+        } else {
+            return ACTIVATION_FAILURE;
+        }
+    }
+
+    //登录账号
+    public Map<String, Object> login(String username, String password, int expiredSeconds) { //expiredSeconds是登录凭证过期时间
+        Map<String, Object> map = new HashMap<>();
+
+        // 空值处理
+        if (StringUtils.isBlank(username)) {
+            map.put("usernameMsg", "账号不能为空!");
+            return map; //返回错误信息给map，map传给html模板model，然后写入html返回给用户看到
+        }
+        if (StringUtils.isBlank(password)) {
+            map.put("passwordMsg", "密码不能为空!");
+            return map;
+        }
+
+        // 验证账号
+        User user = userMapper.selectByName(username);
+        if (user == null) {
+            map.put("usernameMsg", "该账号不存在!");
+            return map;
+        }
+
+        // 验证状态
+        if (user.getStatus() == 0) {
+            map.put("usernameMsg", "该账号未激活!");
+            return map;
+        }
+
+        // 验证密码
+        password = CommunityUtil.md5(password + user.getSalt()); //服务器存的是加密后的密码，要加密后对比
+        if (!user.getPassword().equals(password)) {
+            map.put("passwordMsg", "密码不正确!");
+            return map;
+        }
+
+        // 生成登录凭证
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(user.getId());
+        loginTicket.setTicket(CommunityUtil.generateUUID()); //登录凭证的查询key是一个字符串，这个字符串也会传回给浏览器，下次登录时浏览器发送该key给服务器，服务器直接验证这个字符串就行
+        loginTicket.setStatus(0); //设置状态为0
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + expiredSeconds * 1000)); //设置登录凭证到期时间
+        loginTicketMapper.insertLoginTicket(loginTicket);
+
+        map.put("ticket", loginTicket.getTicket()); //成功后把该ticket返回
+        return map;
+    }
+
+    public void logout(String ticket) {
+        loginTicketMapper.updateStatus(ticket, 1);
+    }
+
+    public LoginTicket findLoginTicket(String ticket) {
+        return loginTicketMapper.selectByTicket(ticket);
+    }
+
+    public int updateHeader(int userId, String headerUrl) {
+        return userMapper.updateHeader(userId, headerUrl);
+    }
+
+    public int updatePassword(int userId, String password) {
+        return userMapper.updatePassword(userId, password);
     }
 }
 
