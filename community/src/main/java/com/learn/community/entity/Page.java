@@ -3,6 +3,7 @@ package com.learn.community.entity;
 /**
  * 封装分页相关的信息.
  */
+//注意page的操作主要是在index.html中，它调用了该bean的set_current等操作，而idea察觉不到，故这些操作是“no usages”
 public class Page {
 
     // 当前页码

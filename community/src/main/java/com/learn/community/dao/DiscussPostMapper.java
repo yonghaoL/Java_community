@@ -17,4 +17,11 @@ public interface DiscussPostMapper {
     // @Param注解用于给参数取别名,这个别名可以在sql语句中使用
     // 如果只有一个参数,并且在sql的<if>里（动态条件）使用,则必须加别名.（上面的方法有三个参数，所以可以不用起别名）
     int selectDiscussPostRows(@Param("userId") int userId);//返回有多少行数据，支持查询给定用户id的查询
+
+    int insertDiscussPost(DiscussPost discussPost);
+
+    DiscussPost selectDiscussPostById(int id);
+
+    int updateCommentCount(int id, int commentCount);//更新该帖子的评论数量
+
 }
