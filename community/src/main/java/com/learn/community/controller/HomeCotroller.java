@@ -47,4 +47,10 @@ public class HomeCotroller {
         model.addAttribute("discussPosts", discussPosts);
         return "/index";//默认父目录为templates,/index全称/index.html，只是参数里面不用写
     }
+
+    //写一个访问500错误（即服务器出错的错误页面展示请求），便于我们在服务器中出错时重定向到该页面
+    @RequestMapping(path = "/error", method = RequestMethod.GET)
+    public String getErrorPage() {
+        return "/error/500";
+    }
 }

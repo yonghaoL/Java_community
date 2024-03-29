@@ -70,9 +70,9 @@ public class AlphaService {
         transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
 
         //实现一个接口的匿名实现类，并返回该类的匿名对象，该接口里面的抽象方法里面写事务（有点像一种创建线程的方法）
-        return transactionTemplate.execute(new TransactionCallback<Object>() { //这里为了演示，泛型就用object了
+        return transactionTemplate.execute(new TransactionCallback<Object>() { //这里为了演示，泛型就用object了，该泛型指定返回值类型
             @Override
-            public Object doInTransaction(TransactionStatus status) {
+            public Object doInTransaction(TransactionStatus status) { //回调方法，这个参数是自动传进来的，我们目前用不上它，回调方法见笔记
                 //代码和save1一样
                 // 新增用户
                 User user = new User();

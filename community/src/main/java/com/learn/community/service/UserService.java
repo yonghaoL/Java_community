@@ -6,6 +6,7 @@ import com.learn.community.entity.LoginTicket;
 import com.learn.community.entity.User;
 import com.learn.community.util.CommunityConstant;
 import com.learn.community.util.CommunityUtil;
+import com.learn.community.util.HostHolder;
 import com.learn.community.util.MailClient;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -176,6 +177,10 @@ public class UserService implements CommunityConstant {
     public int updatePassword(int userId, String password) {
         return userMapper.updatePassword(userId, password);
     }
+
+    public User findUserByName(String toName){
+        return userMapper.selectByName(toName);
+    };
 }
 
 

@@ -20,7 +20,7 @@ public interface MessageMapper {
     // 查询某个会话所包含的私信数量.
     int selectLetterCount(String conversationId);
 
-    // 查询未读私信的数量
+    // 查询未读私信的数量，当有conversationId参数时，查的是该用户的该会话未读数量，没有conversationId参数时，查的是该用户所有会话加起来的未读数量
     int selectLetterUnreadCount(int userId, String conversationId);
 
     // 新增消息

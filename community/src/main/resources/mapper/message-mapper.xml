@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learn.community.dao.MessageMapper">
+
+    <sql id="selectFields">
+        id, from_id, to_id, conversation_id, content, status, create_time
+    </sql>
+
+    <sql id="insertFields">
+        from_id, to_id, conversation_id, content, status, create_time
+    </sql>
+
+    <select id="selectConversations" resultType="Message">
+        select <include refid="selectFields"></include>
+        from message
+        where id in (
+            select max(id) from message <!--再根据这些id取出消息-->
+            where status != 2
+            and from_id != 1 <!--不是系统消息-->
+            and (from_id = #{userId} or to_id = #{userId})
+            group by conversation_id <!--把满足上面三个条件的数据按会话id进行分组，然后返回每组id最大的那个会话id（即每组对话的最新消息）-->
+        )
+        order by id desc
+        limit #{offset}, #{limit} <!--降序并且分页-->
+    </select>
+
+    <select id="selectConversationCount" resultType="int">
+        select count(m.maxid) from (
+            select max(id) as maxid from message
+            where status != 2
+            and from_id != 1
+            and (from_id = #{userId} or to_id = #{userId})
+            group by conversation_id
+        ) as m <!--内层查询取名m-->
+    </select>
+
+    <select id="selectLetters" resultType="Message">
+        select <include refid="selectFields"></include>
+        from message
+        where status != 2
+        and from_id != 1
+        and conversation_id = #{conversationId}
+        order by id desc
+        limit #{offset}, #{limit}
+    </select>
+
+    <select id="selectLetterCount" resultType="int">
+        select count(id)
+        from message
+        where status != 2
+        and from_id != 1
+        and conversation_id = #{conversationId}
+    </select>
+
+    <select id="selectLetterUnreadCount" resultType="int">
+        select count(id)
+        from message
+        where status = 0
+        and from_id != 1
+        and to_id = #{userId} <!--未读一定是别人发给自己的-->
+        <if test="conversationId!=null">
+            and conversation_id = #{conversationId} <!--当有conversationId参数时，查的是该用户的该会话未读数量-->
+        </if>
+    </select>
+
+    <insert id="insertMessage" parameterType="Message" keyProperty="id">
+        insert into message(<include refid="insertFields"></include>)
+        values(#{fromId},#{toId},#{conversationId},#{content},#{status},#{createTime})
+    </insert>
+
+    <update id="updateStatus">
+        update message set status = #{status}
+        where id in
+        <foreach collection="ids" item="id" open="(" separator="," close=")"> <!--mybatis的语法允许我们用这种方式生成一个id集合-->
+            #{id} <!--将ids中的id拼到括号之间，并用逗号隔开-->
+        </foreach>
+    </update>
+
+</mapper>

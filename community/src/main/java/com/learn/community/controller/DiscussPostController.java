@@ -52,7 +52,8 @@ public class DiscussPostController implements CommunityConstant {
 //    @LoginRequired //该方法只有登陆的用户才能访问
     public String addDiscussPost(String title, String content) {
         User user = hostHolder.getUser(); //获取当前登陆的用户
-        //能否直接用@LoginRequired注解,试了下不可以，可能因为这里是ajax代码，不适合拦截器直接重定向
+        //能否直接用@LoginRequired注解,试了下暂时不可以，因为拦截器中是重定向返回了页面，而本方法是异步请求，需要服务器返回JSON数据，可以
+        //->在拦截器中写CommunityUtil.getJSONString(403, "你还没有登录哦!")，为了方便就直接在这个方法中写了，也就不用@LoginRequired了
         if (user == null) {
             return CommunityUtil.getJSONString(403, "你还没有登录哦!");
         }
