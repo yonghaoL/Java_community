@@ -4,7 +4,9 @@ import com.learn.community.entity.DiscussPost;
 import com.learn.community.entity.Page;
 import com.learn.community.entity.User;
 import com.learn.community.service.DiscussPostService;
+import com.learn.community.service.LikeService;
 import com.learn.community.service.UserService;
+import com.learn.community.util.CommunityConstant;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,11 +18,13 @@ import java.util.HashMap;
 import java.util.List;
 
 @Controller
-public class HomeCotroller {
+public class HomeCotroller implements CommunityConstant {
     @Autowired //将Service注入进来，调用服务，服务再访问数据库存取数据
     private DiscussPostService discussPostService;
     @Autowired
     private UserService userService;
+    @Autowired
+    private LikeService likeService;
 
     @RequestMapping(path = "/index", method = RequestMethod.GET)//前面是路径，后面表示只处理GET请求而不处理其他请求，index代表首页
     //注意响应返回的是网页视图的名字路径（String类型），就不要加@ResponseBody注解了
@@ -41,6 +45,10 @@ public class HomeCotroller {
                 HashMap<String, Object> map = new HashMap<>();
                 map.put("post", discussPost);
                 map.put("user", user);
+
+                //查询该帖子点赞数量并放进hashmap中
+                long likeCount = likeService.findEntityLikeCount(ENTITY_TYPE_POST, discussPost.getId());
+                map.put("likeCount", likeCount);
                 discussPosts.add(map);
             }
         }

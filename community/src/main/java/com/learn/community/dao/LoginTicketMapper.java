@@ -4,6 +4,7 @@ import com.learn.community.entity.LoginTicket;
 import org.apache.ibatis.annotations.*;
 
 @Mapper
+@Deprecated
 public interface LoginTicketMapper {
 
     //可以用注解来实现对应sql语句（也可以用xml文件配置，之前的DiscussPostMapper就是用xml文件）

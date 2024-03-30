@@ -4,7 +4,8 @@ import com.learn.community.entity.User;
 import org.springframework.stereotype.Component;
 
 /**
- * 持有用户信息,用于代替session对象.如果用session存储当前用户，不可用于分布式系统
+ * 持有用户信息,用于代替session对象.如果用session存储当前用户，不可用于分布式系统。
+ * 用ThreadLocal<User> users即可实现每个线程取到自己对应的用户
  */
 @Component
 public class HostHolder {

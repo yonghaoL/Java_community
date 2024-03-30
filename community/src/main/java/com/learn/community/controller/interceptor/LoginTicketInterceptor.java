@@ -26,7 +26,7 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 //        System.out.println("Ticket拦截器生效");
-        // 先从Request中获取到ticket（它是登录凭证对应session的key值，存放在cookies中）
+        // 先从Request中获取到ticket（它是登录凭证的key值，存放在cookies中）
         String ticket = CookieUtil.getValue(request, "ticket");
 
         if (ticket != null) {

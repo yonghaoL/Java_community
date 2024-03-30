@@ -2,7 +2,10 @@ package com.learn.community.controller;
 
 import com.learn.community.annotation.LoginRequired;
 import com.learn.community.entity.User;
+import com.learn.community.service.FollowService;
+import com.learn.community.service.LikeService;
 import com.learn.community.service.UserService;
+import com.learn.community.util.CommunityConstant;
 import com.learn.community.util.CommunityUtil;
 import com.learn.community.util.HostHolder;
 import org.apache.commons.lang3.StringUtils;
@@ -25,7 +28,7 @@ import java.io.OutputStream;
 
 @Controller
 @RequestMapping("/user")
-public class UserController {
+public class UserController implements CommunityConstant {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     @Value("${community.path.upload}")
@@ -42,6 +45,13 @@ public class UserController {
 
     @Autowired
     private HostHolder hostHolder;
+
+    @Autowired
+    private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
+
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
     @LoginRequired //该方法只有登陆的用户才能访问
     public String getSettingPage() {
@@ -133,6 +143,36 @@ public class UserController {
         System.out.println("修改成功");
 
         return "redirect:/index"; //重定向到首页，可以让用户看到更新后的头像
+    }
+
+    // 个人主页
+    @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
+    public String getProfilePage(@PathVariable("userId") int userId, Model model) { //参数是userId，使得可以看别人的主页
+        User user = userService.findUserById(userId);
+        if (user == null) {
+            throw new RuntimeException("该用户不存在!");
+        }
+
+        // 用户
+        model.addAttribute("user", user);
+        // 点赞数量
+        int likeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount", likeCount);
+
+        // 该用户的关注数量（实体类型为用户）
+        long followeeCount = followService.findFolloweeCount(userId, ENTITY_TYPE_USER);
+        model.addAttribute("followeeCount", followeeCount); //传给模板以传给前端
+        // 该用户的粉丝数量
+        long followerCount = followService.findFollowerCount(ENTITY_TYPE_USER, userId);
+        model.addAttribute("followerCount", followerCount);
+        // 是否已关注
+        boolean hasFollowed = false;
+        if (hostHolder.getUser() != null) { //严谨：当前能否有用户登录
+            hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
+        }
+        model.addAttribute("hasFollowed", hasFollowed);
+
+        return "/site/profile";
     }
 
 }
