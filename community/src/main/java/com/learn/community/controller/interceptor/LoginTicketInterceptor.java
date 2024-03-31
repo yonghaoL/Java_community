@@ -44,7 +44,7 @@ public class LoginTicketInterceptor implements HandlerInterceptor {
         return true;
     }
 
-    //模板之前调用该方法，我们在该方法中将user存入model中！！！！以在html中使用
+    //模板之前调用该方法，我们在该方法中将user存入model中！！！！以在html中使用，这也是为什么登录后一段时间不用重新登陆的原因！
     @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, ModelAndView modelAndView) throws Exception {
         User user = hostHolder.getUser();

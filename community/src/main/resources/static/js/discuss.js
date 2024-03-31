@@ -1,7 +1,7 @@
-function like(btn, entityType, entityId, entityUserId) { //html中传入的参数
+function like(btn, entityType, entityId, entityUserId, postId) { //html中传入的参数
     $.post(
         CONTEXT_PATH + "/like",
-        {"entityType":entityType,"entityId":entityId,"entityUserId":entityUserId},
+        {"entityType":entityType,"entityId":entityId,"entityUserId":entityUserId,"postId":postId}, //传JSON格式数据给后台
         function(data) {
             data = $.parseJSON(data);
             if(data.code == 0) { //请求成功

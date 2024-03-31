@@ -33,6 +33,9 @@ public class ServiceLogAspect {
 
         //获取request，然后获取ip
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (attributes == null) { //我们有可能通过EventConsumer去调用service下的方法，此时不是通过Controller访问的，attributes会报空指针异常，要处理一下
+            return;
+        }
         HttpServletRequest request = attributes.getRequest();
         String ip = request.getRemoteHost();
         String now = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()); //现在的日期

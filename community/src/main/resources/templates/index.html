@@ -29,8 +29,9 @@
 								<a class="nav-link" th:href="@{/index}">首页</a>
 							</li>
 <!--							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser==null}">-->
-							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser!=null}"> <!--该loginUser应该是在拦截器中存入的-->
-								<a class="nav-link position-relative" th:href="@{/letter/list}">消息<span class="badge badge-danger">12</span></a>
+							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser!=null}">
+								<!--接收拦截器的参数，页面头部显示未读消息总数-->
+								<a class="nav-link position-relative" th:href="@{/letter/list}">消息<span class="badge badge-danger" th:text="${allUnreadCount!=0?allUnreadCount:''}">12</span></a>
 							</li>
 							<li class="nav-item ml-3 btn-group-vertical" th:if="${loginUser==null}">
 								<a class="nav-link" th:href="@{/register}">注册</a> <!--点击注册按钮则返回register.html-->
