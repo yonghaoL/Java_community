@@ -5,6 +5,7 @@ import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 
+//mapper是spring提供的mybatis相关的注解
 @Mapper
 public interface CommentMapper {
 
