@@ -6,6 +6,7 @@ import com.learn.community.entity.Event;
 import com.learn.community.entity.Message;
 import com.learn.community.service.DiscussPostService;
 //import com.learn.community.service.ElasticsearchService;
+import com.learn.community.service.ElasticsearchService;
 import com.learn.community.service.MessageService;
 import com.learn.community.util.CommunityConstant;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -30,8 +31,8 @@ public class EventConsumer implements CommunityConstant {
     @Autowired
     private DiscussPostService discussPostService;
 
-//    @Autowired
-//    private ElasticsearchService elasticsearchService;
+    @Autowired
+    private ElasticsearchService elasticsearchService;
 
     @KafkaListener(topics = {TOPIC_COMMENT, TOPIC_LIKE, TOPIC_FOLLOW}) //该消费者监听三个主题（被动的，不用我们主动调，它会一直监听）
     public void handleCommentMessage(ConsumerRecord record) {
@@ -69,8 +70,8 @@ public class EventConsumer implements CommunityConstant {
     }
 
     // 消费发帖事件
-    @KafkaListener(topics = {TOPIC_PUBLISH})
-    public void handlePublishMessage(ConsumerRecord record) {
+    @KafkaListener(topics = {TOPIC_PUBLISH}) //监听的是发帖主题
+    public void handlePublishMessage(ConsumerRecord record) { //record为消息
         if (record == null || record.value() == null) {
             logger.error("消息的内容为空!");
             return;
@@ -82,8 +83,8 @@ public class EventConsumer implements CommunityConstant {
             return;
         }
 
-        DiscussPost post = discussPostService.findDiscussPostById(event.getEntityId());
-//        elasticsearchService.saveDiscussPost(post);
+        DiscussPost post = discussPostService.findDiscussPostById(event.getEntityId()); //从数据库里面拿出该帖子存到ES服务器里
+        elasticsearchService.saveDiscussPost(post);
     }
 
 }

@@ -2,11 +2,9 @@ package com.learn.community.controller;
 
 //import com.learn.community.entity.Comment;
 import com.learn.community.annotation.LoginRequired;
-import com.learn.community.entity.Comment;
-import com.learn.community.entity.DiscussPost;
-import com.learn.community.entity.Page;
-import com.learn.community.entity.User;
+import com.learn.community.entity.*;
 //import com.learn.community.service.CommentService;
+import com.learn.community.event.EventProducer;
 import com.learn.community.service.CommentService;
 import com.learn.community.service.DiscussPostService;
 //import com.learn.community.service.LikeService;
@@ -44,6 +42,9 @@ public class DiscussPostController implements CommunityConstant {
     @Autowired
     private LikeService likeService;
 
+    @Autowired
+    private EventProducer eventProducer;
+
     //提交帖子请求，这里需要增量式处理，即ajax，具体获取数据和重定向的操作在index.js文件中
     @RequestMapping(path = "/add", method = RequestMethod.POST)
     @ResponseBody
@@ -63,10 +64,19 @@ public class DiscussPostController implements CommunityConstant {
         post.setCreateTime(new Date());
         discussPostService.addDiscussPost(post);
 
-        // 报错的情况,将来统一处理.
+        // 触发发帖事件
+        Event event = new Event()
+                .setTopic(TOPIC_PUBLISH)
+                .setUserId(user.getId())
+                .setEntityType(ENTITY_TYPE_POST)
+                .setEntityId(post.getId());
+        eventProducer.fireEvent(event);
+
+        // 报错的情况,统一处理.
         return CommunityUtil.getJSONString(0, "发布成功!");
     }
 
+    //查看帖子
     @RequestMapping(path = "/detail/{discussPostId}", method = RequestMethod.GET)
     public String getDiscussPost(@PathVariable("discussPostId") int discussPostId, Model model, Page page) {
         DiscussPost discussPost = discussPostService.findDiscussPostById(discussPostId);
