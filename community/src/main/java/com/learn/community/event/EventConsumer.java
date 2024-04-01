@@ -34,9 +34,10 @@ public class EventConsumer implements CommunityConstant {
     @Autowired
     private ElasticsearchService elasticsearchService;
 
+    //消费通知事件
     @KafkaListener(topics = {TOPIC_COMMENT, TOPIC_LIKE, TOPIC_FOLLOW}) //该消费者监听三个主题（被动的，不用我们主动调，它会一直监听）
     public void handleCommentMessage(ConsumerRecord record) {
-        if (record == null || record.value() == null) { //空消息
+        if (record == null || record.value() == null) { //空消息（注意这是指生产者的“消息”，而不是web发消息）
             logger.error("消息的内容为空!");
             return;
         }
@@ -69,10 +70,10 @@ public class EventConsumer implements CommunityConstant {
         messageService.addMessage(message);
     }
 
-    // 消费发帖事件
-    @KafkaListener(topics = {TOPIC_PUBLISH}) //监听的是发帖主题
+    // 消费发帖（或帖子信息变化）事件
+    @KafkaListener(topics = {TOPIC_PUBLISH}) //监听的是帖子更新主题，此时需要更新ES服务器中的帖子信息以同步
     public void handlePublishMessage(ConsumerRecord record) { //record为消息
-        if (record == null || record.value() == null) {
+        if (record == null || record.value() == null) {//空消息（注意这是指生产者的“消息”，而不是web发消息）
             logger.error("消息的内容为空!");
             return;
         }
@@ -87,4 +88,20 @@ public class EventConsumer implements CommunityConstant {
         elasticsearchService.saveDiscussPost(post);
     }
 
+    // 消费删帖事件
+    @KafkaListener(topics = {TOPIC_DELETE})
+    public void handleDeleteMessage(ConsumerRecord record) {
+        if (record == null || record.value() == null) {//空消息（注意这是指生产者的“消息”，而不是web发消息）
+            logger.error("消息的内容为空!");
+            return;
+        }
+
+        Event event = JSONObject.parseObject(record.value().toString(), Event.class);
+        if (event == null) {
+            logger.error("消息格式错误!");
+            return;
+        }
+
+        elasticsearchService.deleteDiscussPost(event.getEntityId());
+    }
 }

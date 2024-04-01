@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.CookieValue;
@@ -191,7 +192,8 @@ public class LoginController implements CommunityConstant {
 
     @RequestMapping(path = "/logout", method = RequestMethod.GET)
     public String logout(@CookieValue("ticket") String ticket) { //接收cookie中的登录凭证的ticket值（注意浏览器端只存储该key值即map.get("ticket").toString()，完整登录凭证对象在数据库），用来退出
-        userService.logout(ticket);
+        userService.logout(ticket); //logout里面会使ticket失效
+        SecurityContextHolder.clearContext(); //退出时释放SecurityContextHolder中的用户认证
         return "redirect:/login";
     }
 }

@@ -19,8 +19,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
     private LoginTicketInterceptor loginTicketInterceptor;
 
     //把拦截器注入进来，生成一个实例，这些拦截器都是在interceptor文件下定义好，注入到这个配置文件类里面来的
-    @Autowired
-    private LoginRequiredInterceptor loginRequiredInterceptor;
+//    @Autowired
+//    private LoginRequiredInterceptor loginRequiredInterceptor;
 
     @Autowired
     private MessageInterceptor messageInterceptor;
@@ -36,8 +36,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
         registry.addInterceptor(loginTicketInterceptor) //该拦截器会拦截除了这些路径格式之外的的请求，然后处理（减少操作）
                 .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
 
-        registry.addInterceptor(loginRequiredInterceptor)//该拦截器会拦截除了这些路径格式之外的的请求，然后处理
-                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");//(说明所有动态请求都被拦截)
+//        registry.addInterceptor(loginRequiredInterceptor)//该拦截器会拦截除了这些路径格式之外的的请求，然后处理
+//                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");//(说明所有动态请求都被拦截)
 
         registry.addInterceptor(messageInterceptor)//该拦截器会拦截除了这些路径格式之外的的请求，然后处理
                 .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
