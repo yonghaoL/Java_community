@@ -1,9 +1,6 @@
 package com.learn.community.config;
 
-import com.learn.community.controller.interceptor.AlphaInterceptor;
-import com.learn.community.controller.interceptor.LoginRequiredInterceptor;
-import com.learn.community.controller.interceptor.LoginTicketInterceptor;
-import com.learn.community.controller.interceptor.MessageInterceptor;
+import com.learn.community.controller.interceptor.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -25,6 +22,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Autowired
     private MessageInterceptor messageInterceptor;
 
+    @Autowired
+    private DataInterceptor dataInterceptor;
+
     // /**/*.css指所有文件夹下的所有.css文件
     @Override
     public void addInterceptors(InterceptorRegistry registry) { //这三个拦截器被我们传进了registry中，然后被spring使用
@@ -40,6 +40,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 //                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");//(说明所有动态请求都被拦截)
 
         registry.addInterceptor(messageInterceptor)//该拦截器会拦截除了这些路径格式之外的的请求，然后处理
+                .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
+
+        registry.addInterceptor(dataInterceptor)
                 .excludePathPatterns("/**/*.css", "/**/*.js", "/**/*.png", "/**/*.jpg", "/**/*.jpeg");
 
         //这里添加了多个拦截器，多个拦截器的执行顺序与添加顺序相同，执行流程见笔记

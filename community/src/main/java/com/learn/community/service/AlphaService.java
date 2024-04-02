@@ -7,6 +7,8 @@ import com.learn.community.entity.User;
 import com.learn.community.util.CommunityUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.TransactionStatus;
@@ -19,6 +21,8 @@ import org.springframework.transaction.support.TransactionTemplate;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Service
 //@Scope("prototype")
@@ -32,6 +36,8 @@ public class AlphaService {
 
     @Autowired
     private TransactionTemplate transactionTemplate; //这个bean是sping自动创建并自动装配到容器里
+
+    private static final Logger logger = LoggerFactory.getLogger(AlphaService.class);
 
     //声明式事务//
     // REQUIRED: 支持当前事务(外部事务),如果不存在则创建新事务.
@@ -97,6 +103,16 @@ public class AlphaService {
                 return "ok";
             }
         });
+    }
+
+    @Async //有该注解后，让该方法在多线程环境下被异步调用（即和主线程并发执行）
+    public void execute1() {
+        logger.debug("execute1");
+    }
+
+    @Scheduled(initialDelay = 10000, fixedRate = 1000) //10000ms延迟，间隔为1000ms
+    public void execute2() {
+        logger.debug("execute2");
     }
 
 }
