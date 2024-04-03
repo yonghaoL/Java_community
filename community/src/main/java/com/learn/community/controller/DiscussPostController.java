@@ -14,6 +14,7 @@ import com.learn.community.util.CommunityConstant;
 import com.learn.community.util.CommunityUtil;
 import com.learn.community.util.HostHolder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,6 +46,9 @@ public class DiscussPostController implements CommunityConstant {
     @Autowired
     private EventProducer eventProducer;
 
+    @Autowired
+    private RedisTemplate redisTemplate;
+
     //提交帖子请求，这里需要增量式处理，即ajax，具体获取数据和重定向的操作在index.js文件中
     @RequestMapping(path = "/add", method = RequestMethod.POST)
     @ResponseBody
@@ -71,6 +75,10 @@ public class DiscussPostController implements CommunityConstant {
                 .setEntityType(ENTITY_TYPE_POST)
                 .setEntityId(post.getId());
         eventProducer.fireEvent(event);
+
+        // 加入计算帖子分数的任务缓存
+        String redisKey = RedisKeyUtil.getPostScoreKey();
+        redisTemplate.opsForSet().add(redisKey, post.getId()); //需要放到set里，因为会有重复的任务（两人对同一个帖子点了赞）
 
         // 报错的情况,统一处理.
         return CommunityUtil.getJSONString(0, "发布成功!");
@@ -192,10 +200,10 @@ public class DiscussPostController implements CommunityConstant {
                 .setEntityId(id);
         eventProducer.fireEvent(event);
 
-//        // 计算帖子分数
-//        String redisKey = RedisKeyUtil.getPostScoreKey();
-//        redisTemplate.opsForSet().add(redisKey, id);
-//
+        // 加入计算帖子分数任务缓存
+        String redisKey = RedisKeyUtil.getPostScoreKey();
+        redisTemplate.opsForSet().add(redisKey, id);
+
         return CommunityUtil.getJSONString(0);
     }
 

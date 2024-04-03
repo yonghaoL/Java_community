@@ -110,9 +110,9 @@ public class AlphaService {
         logger.debug("execute1");
     }
 
-    @Scheduled(initialDelay = 10000, fixedRate = 1000) //10000ms延迟，间隔为1000ms
-    public void execute2() {
-        logger.debug("execute2");
-    }
+//    @Scheduled(initialDelay = 10000, fixedRate = 1000) //10000ms延迟，间隔为1000ms，只要程序启动，它就自动触发，故需要注释掉
+//    public void execute2() {
+//        logger.debug("execute2");
+//    }
 
 }

@@ -3,6 +3,7 @@ spring.application.name=community
 
 # ServerProperties
 server.port=8080
+# 大的访问路径
 server.servlet.context-path=/community
 
 # ThymeleafProperties

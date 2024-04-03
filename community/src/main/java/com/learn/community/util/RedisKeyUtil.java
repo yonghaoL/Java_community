@@ -13,7 +13,7 @@ public class RedisKeyUtil {
     private static final String PREFIX_USER = "user";
     private static final String PREFIX_UV = "uv"; //网站活跃量，独立访问者统计
     private static final String PREFIX_DAU = "dau"; //活跃用户量
-    private static final String PREFIX_POST = "post";
+    private static final String PREFIX_POST = "post"; //最近更新的帖子（有新的点赞或者评论）
     // 某个实体的赞
     // like:entity:entityType:entityId -> set(userId) //给该实体点赞的用户id集合（set）
     public static String getEntityLikeKey(int entityType, int entityId) { //被点赞的实体类型和id
@@ -72,6 +72,11 @@ public class RedisKeyUtil {
     // 区间活跃用户
     public static String getDAUKey(String startDate, String endDate) {
         return PREFIX_DAU + SPLIT + startDate + SPLIT + endDate;
+    }
+
+    // 帖子分数
+    public static String getPostScoreKey() {
+        return PREFIX_POST + SPLIT + "score";
     }
 
 }

@@ -19,7 +19,12 @@
         <if test="userId!=0"> <!--为0时，返回所有帖子！-->
             and user_id = #{userId}
         </if>
-        order by type desc, create_time desc <!--现根据type降序，再根据创建时间降序-->
+        <if test="orderMode==0">
+            order by type desc, create_time desc
+        </if>
+        <if test="orderMode==1">
+            order by type desc, score desc, create_time desc <!--现根据type降序，再根据创建时间降序-->
+        </if>
         limit #{offset}, #{limit} <!--限制该页的起始行号和行数-->
     </select>
 
